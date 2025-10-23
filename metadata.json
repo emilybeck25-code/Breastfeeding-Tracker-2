@@ -1,0 +1,5 @@
+{
+  "name": "Baby Breastfeeding Tracker",
+  "description": "A simple and beautiful mobile-first app to track your baby's breastfeeding sessions. It remembers which side to use next, times the current feed, and shows how long it's been since the last one.",
+  "requestFramePermissions": []
+}
