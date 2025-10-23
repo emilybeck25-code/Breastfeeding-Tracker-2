@@ -1,5 +1,4 @@
 import React from 'react';
-// FIX: Corrected import path for types to resolve module loading error.
 import { Page } from '../types/index';
 
 interface NavBarProps {
@@ -10,7 +9,6 @@ interface NavBarProps {
 const NavButton: React.FC<{
     page: Page;
     label: string;
-    // FIX: Replaced JSX.Element with React.ReactNode to resolve the 'Cannot find namespace JSX' error.
     icon: React.ReactNode;
     currentPage: Page;
     setCurrentPage: (page: Page) => void;

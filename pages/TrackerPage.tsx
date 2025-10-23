@@ -1,5 +1,4 @@
 import React from 'react';
-// FIX: Corrected import path for types to resolve module loading error.
 import { FeedingSide, SingleFeed, FeedingUnit } from '../types/index';
 import { useTimer } from '../hooks/useTimer';
 import TimerDisplay from '../components/TimerDisplay';

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// FIX: Corrected import path for types to resolve module loading error.
 import { Page } from './types/index';
 import DailySummary from './pages/DailySummary';
 import MonthlySummary from './pages/MonthlySummary';

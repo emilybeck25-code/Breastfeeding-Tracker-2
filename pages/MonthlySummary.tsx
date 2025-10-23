@@ -1,5 +1,4 @@
 import React from 'react';
-// FIX: Corrected import path for types to resolve module loading error.
 import { FeedingUnit } from '../types/index';
 
 interface MonthlySummaryProps {

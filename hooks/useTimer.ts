@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-// FIX: Corrected import path for types to resolve module loading error.
 import { FeedingSide } from '../types/index';
 
 export const useTimer = () => {
