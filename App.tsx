@@ -147,9 +147,8 @@ const App: React.FC = () => {
 
         if (shouldGroup) {
             const finalSessions = [...lastFeedingUnit.sessions, newSingleFeed].sort((a,b) => {
-              if (a.side === FeedingSide.Left) return -1;
-              if (b.side === FeedingSide.Left) return 1;
-              return 0;
+              // This sort ensures the display order is chronological based on which side was clicked first in the UI
+              return lastFeedingUnit.sessions[0].endTime - a.endTime;
             });
 
             const updatedUnit = {
@@ -195,23 +194,40 @@ const App: React.FC = () => {
         case Page.Tracker:
             return (
                 <div className="flex flex-col h-full">
-                    {/* Section 1: Timer Area (Fixed Height) */}
-                    <div className="flex-shrink-0 flex flex-col items-center justify-center px-4 h-32">
-                        {activeSide ? (
-                            <div className="text-center">
-                                <p className="text-slate-500 mb-2">Feeding on {activeSide} side</p>
-                                <TimerDisplay seconds={feedDuration} className="text-7xl font-sans text-slate-800 tracking-tighter" />
-                            </div>
-                        ) : (
-                            <div className="text-center text-slate-500">
-                                <p>Tap L or R to start a feed.</p>
+                    {/* Section 1: Static Top Area (Timer + History Header) */}
+                    <div className="flex-shrink-0 px-4">
+                        {/* Timer part */}
+                        <div className="flex flex-col items-center justify-center h-32">
+                            {activeSide ? (
+                                <div className="text-center">
+                                    <p className="text-slate-500 mb-2">Feeding on {activeSide} side</p>
+                                    <TimerDisplay seconds={feedDuration} className="text-7xl font-sans text-slate-800 tracking-tighter" />
+                                </div>
+                            ) : (
+                                <div className="text-center text-slate-500">
+                                    <p>Tap L or R to start a feed.</p>
+                                </div>
+                            )}
+                        </div>
+                        {/* History Header part (only shown if there's history) */}
+                        {history.length > 0 && (
+                            <div className="flex justify-between items-center pb-2">
+                              <h2 className="text-xl font-bold text-slate-600">Feeding History</h2>
+                              <button
+                                onClick={handleClearHistory}
+                                className="text-sm bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full transition-colors"
+                              >
+                                Clear
+                              </button>
                             </div>
                         )}
                     </div>
+                    
                     {/* Section 2: History Log (Fills remaining space and scrolls) */}
                     <div className="flex-grow overflow-y-auto px-4 pb-4">
-                        <HistoryLog sessions={chronologicalHistory} onClear={handleClearHistory} />
+                        <HistoryLog sessions={chronologicalHistory} />
                     </div>
+
                      {/* Section 3: Buttons Area (Fixed Height, static) */}
                     <div className="flex-shrink-0 flex justify-around items-center px-4 h-32">
                         <button

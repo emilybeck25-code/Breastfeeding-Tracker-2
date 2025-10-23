@@ -4,7 +4,6 @@ import TimerDisplay from './TimerDisplay';
 
 interface HistoryLogProps {
   sessions: FeedingUnit[];
-  onClear: () => void;
 }
 
 const formatDateHeader = (dateString: string): string => {
@@ -49,17 +48,19 @@ const formatTimeSince = (milliseconds: number): string => {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  const hourText = hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''}` : '';
-  const minuteText = minutes > 0 ? `${minutes} minute${minutes > 1 ? 's' : ''}` : '';
-
+  const parts = [];
   if (hours > 0) {
-    return `${hourText}${minutes > 0 ? ' ' : ''}${minuteText}`;
+    parts.push(`${hours}h`);
   }
-  return minuteText;
+  if (minutes > 0) {
+    parts.push(`${minutes}m`);
+  }
+
+  return parts.join(' ');
 };
 
 
-const HistoryLog: React.FC<HistoryLogProps> = ({ sessions, onClear }) => {
+const HistoryLog: React.FC<HistoryLogProps> = ({ sessions }) => {
   if (sessions.length === 0) {
     return (
       <div className="text-center py-8 text-slate-500">
@@ -92,15 +93,6 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ sessions, onClear }) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-slate-600">Feeding History</h2>
-        <button
-          onClick={onClear}
-          className="text-sm bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full transition-colors"
-        >
-          Clear
-        </button>
-      </div>
       <div className="space-y-6">
         {sortedDays.map((dateKey) => (
           <section key={dateKey} aria-labelledby={`date-${dateKey}`} className="bg-white p-4 rounded-lg shadow-lg">
