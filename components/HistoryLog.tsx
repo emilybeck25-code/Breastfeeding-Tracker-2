@@ -29,7 +29,6 @@ const formatDateHeader = (dateString: string): string => {
 
 const groupSessionsByDay = (sessions: FeedingUnit[]): Record<string, FeedingUnit[]> => {
   return sessions.reduce((acc, session) => {
-    // Group by the start of the day to avoid timezone issues
     const day = new Date(session.endTime);
     day.setHours(0, 0, 0, 0);
     const dateKey = day.toISOString();
@@ -92,7 +91,7 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ sessions, onClear }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto px-4">
+    <div className="w-full max-w-md mx-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-slate-600">Feeding History</h2>
         <button
@@ -118,10 +117,10 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ sessions, onClear }) => {
                 const formattedStartTime = new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const formattedEndTime = new Date(endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                const globalIndex = sessions.findIndex(s => s.id === unit.id);
+                const globalChronologicalIndex = sessions.findIndex(s => s.id === unit.id);
                 let timeSinceLastFeed = '';
-                if (globalIndex > 0) {
-                    const previousUnit = sessions[globalIndex - 1];
+                if (globalChronologicalIndex > 0) {
+                    const previousUnit = sessions[globalChronologicalIndex - 1];
                     const diffMs = startTime - previousUnit.endTime;
                     timeSinceLastFeed = formatTimeSince(diffMs);
                 }

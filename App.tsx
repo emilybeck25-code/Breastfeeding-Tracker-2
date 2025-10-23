@@ -27,9 +27,15 @@ const App: React.FC = () => {
             endTime: firstSession.endTime, // End time is the same as the first feed
         };
 
+        const sortedSessions = [...unitToComplete.sessions, dummySession].sort((a,b) => {
+            if (a.side === FeedingSide.Left) return -1;
+            if (b.side === FeedingSide.Left) return 1;
+            return 0;
+        });
+
         return {
             ...unitToComplete,
-            sessions: [...unitToComplete.sessions, dummySession],
+            sessions: sortedSessions,
             // endTime of the unit remains the same as the first session's end time.
         };
     }
@@ -104,6 +110,18 @@ const App: React.FC = () => {
             }, remainingTime);
 
             return () => clearTimeout(timerId);
+        } else {
+             // If time is already up when component mounts, complete it immediately.
+             setHistory(currentHistory => {
+                const latestUnit = currentHistory[0];
+                if (latestUnit && latestUnit.id === lastUnit.id && latestUnit.sessions.length === 1) {
+                    const completedUnit = completeFeedingUnit(latestUnit);
+                    if (completedUnit) {
+                        return [completedUnit, ...currentHistory.slice(1)];
+                    }
+                }
+                return currentHistory;
+            });
         }
     }
   }, [history]);
@@ -128,9 +146,15 @@ const App: React.FC = () => {
             timeSinceLastFeed < PENDING_TIMEOUT_MS;
 
         if (shouldGroup) {
+            const finalSessions = [...lastFeedingUnit.sessions, newSingleFeed].sort((a,b) => {
+              if (a.side === FeedingSide.Left) return -1;
+              if (b.side === FeedingSide.Left) return 1;
+              return 0;
+            });
+
             const updatedUnit = {
                 ...lastFeedingUnit,
-                sessions: [...lastFeedingUnit.sessions.sort((a,b) => a.endTime - b.endTime), newSingleFeed],
+                sessions: finalSessions,
                 endTime: newSingleFeed.endTime,
             };
             return [updatedUnit, ...currentHistory.slice(1)];
@@ -172,11 +196,11 @@ const App: React.FC = () => {
             return (
                 <div className="flex flex-col h-full">
                     {/* Section 1: Timer Area (Fixed Height) */}
-                    <div className="flex-shrink-0 flex flex-col items-center justify-center px-4 h-48">
+                    <div className="flex-shrink-0 flex flex-col items-center justify-center px-4 h-32">
                         {activeSide ? (
                             <div className="text-center">
                                 <p className="text-slate-500 mb-2">Feeding on {activeSide} side</p>
-                                <TimerDisplay seconds={feedDuration} className="text-7xl font-sans text-slate-800 tracking-widest" />
+                                <TimerDisplay seconds={feedDuration} className="text-7xl font-sans text-slate-800 tracking-tighter" />
                             </div>
                         ) : (
                             <div className="text-center text-slate-500">
@@ -185,16 +209,16 @@ const App: React.FC = () => {
                         )}
                     </div>
                     {/* Section 2: History Log (Fills remaining space and scrolls) */}
-                    <div className="flex-grow overflow-y-auto px-4">
+                    <div className="flex-grow overflow-y-auto px-4 pb-4">
                         <HistoryLog sessions={chronologicalHistory} onClear={handleClearHistory} />
                     </div>
                      {/* Section 3: Buttons Area (Fixed Height, static) */}
-                    <div className="flex-shrink-0 flex justify-between items-center px-8 h-44">
+                    <div className="flex-shrink-0 flex justify-around items-center px-4 h-32">
                         <button
                             onClick={() => handleSideButtonClick(FeedingSide.Left)}
                             disabled={activeSide === FeedingSide.Right}
                             aria-label={activeSide === FeedingSide.Left ? 'Stop left side feed' : 'Start left side feed'}
-                            className={`w-36 h-36 rounded-full text-5xl font-bold text-white shadow-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center
+                            className={`w-28 h-28 rounded-full text-5xl font-bold text-white shadow-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center
                                 ${activeSide === FeedingSide.Left ? 'bg-red-600 hover:bg-red-700' : 'bg-violet-400 hover:bg-violet-500'}
                                 disabled:bg-slate-300 disabled:opacity-70 disabled:cursor-not-allowed`}
                         >
@@ -204,7 +228,7 @@ const App: React.FC = () => {
                             onClick={() => handleSideButtonClick(FeedingSide.Right)}
                             disabled={activeSide === FeedingSide.Left}
                             aria-label={activeSide === FeedingSide.Right ? 'Stop right side feed' : 'Start right side feed'}
-                            className={`w-36 h-36 rounded-full text-5xl font-bold text-white shadow-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center
+                            className={`w-28 h-28 rounded-full text-5xl font-bold text-white shadow-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center
                                 ${activeSide === FeedingSide.Right ? 'bg-red-600 hover:bg-red-700' : 'bg-rose-400 hover:bg-rose-500'}
                                 disabled:bg-slate-300 disabled:opacity-70 disabled:cursor-not-allowed`}
                         >
@@ -225,8 +249,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col pt-6 pb-24 font-sans">
-      <header className="text-center mb-6 px-4">
+    <div className="h-screen bg-gray-100 flex flex-col pt-6 pb-20 font-sans">
+      <header className="text-center mb-6 px-4 flex-shrink-0">
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-rose-400">
           Baby Feed Tracker
         </h1>
