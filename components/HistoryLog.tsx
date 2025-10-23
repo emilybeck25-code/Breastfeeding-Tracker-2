@@ -1,5 +1,6 @@
 import React from 'react';
-import { FeedingUnit, FeedingSide, SingleFeed } from '../types';
+// FIX: Corrected import path for types to resolve module loading error.
+import { FeedingUnit, FeedingSide, SingleFeed } from '../types/index';
 import TimerDisplay from './TimerDisplay';
 
 interface HistoryLogProps {

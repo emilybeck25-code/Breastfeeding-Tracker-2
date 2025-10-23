@@ -1,5 +1,6 @@
 import React from 'react';
-import { Page } from '../types';
+// FIX: Corrected import path for types to resolve module loading error.
+import { Page } from '../types/index';
 
 interface NavBarProps {
     currentPage: Page;
